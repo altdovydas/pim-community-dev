@@ -1499,7 +1499,7 @@ class WebUser extends PimContext
             $steps[] = new Step\Then(sprintf('I remove rights to %s', $data['permission']));
             $steps[] = new Step\Then('I save the role');
             $steps[] = new Step\Then(sprintf('I am on the %s page', $data['page']));
-            $steps[] = new Step\Then(sprintf('I should not see "%s"', $data['button']));
+            $steps[] = new Step\Then(sprintf('I should not see the text "%s"', $data['button']));
             if ($forbiddenPage = $data['forbiddenPage']) {
                 $steps[] = new Step\Then(sprintf('I should not be able to access the %s page', $forbiddenPage));
             }
@@ -1521,12 +1521,12 @@ class WebUser extends PimContext
 
         foreach ($table->getHash() as $data) {
             $steps[] = new Step\Then(sprintf('I am on the %s page', $data['page']));
-            $steps[] = new Step\Then(sprintf('I should see "%s"', $data['section']));
+            $steps[] = new Step\Then(sprintf('I should see the text "%s"', $data['section']));
             $steps[] = new Step\Then('I am on the "Administrator" role page');
             $steps[] = new Step\Then(sprintf('I remove rights to %s', $data['permission']));
             $steps[] = new Step\Then('I save the role');
             $steps[] = new Step\Then(sprintf('I am on the %s page', $data['page']));
-            $steps[] = new Step\Then(sprintf('I should not see "%s"', $data['section']));
+            $steps[] = new Step\Then(sprintf('I should not see the text "%s"', $data['section']));
         }
 
         return $steps;
@@ -1845,6 +1845,11 @@ class WebUser extends PimContext
     public function iPressOnTheDropdownButton($item, $button)
     {
         $this->spin(function () use ($item, $button) {
+            $loading = $this->getCurrentPage()->find('css', '#loading-wrapper');
+            return null === $loading || !$loading->isVisible();
+        }, 'Could not press the dropdown buttons because of loading wrapper');
+
+        $this->spin(function () use ($item, $button) {
             $this
                 ->getCurrentPage()
                 ->getDropdownButtonItem($item, $button)
@@ -1852,7 +1857,6 @@ class WebUser extends PimContext
 
             return true;
         }, sprintf('Cannot click on item "%s" on the dropdown "%s"', $item, $button));
-
         $this->wait();
     }
 
@@ -2097,6 +2101,15 @@ class WebUser extends PimContext
         }, sprintf('The job execution of "%s" was too long', $code));
 
         $this->getMainContext()->getContainer()->get('pim_connector.doctrine.cache_clearer')->clear();
+        $esClients = $this->getMainContext()->getContainer()->get('akeneo_elasticsearch.registry.clients')->getClients();
+        foreach ($esClients as $esClient) {
+            $esClient->refreshIndex();
+        }
+
+        $esClients = $this->getMainContext()->getContainer()->get('akeneo_elasticsearch.registry.clients')->getClients();
+        foreach ($esClients as $esClient) {
+            $esClient->refreshIndex();
+        }
 
         return [
             new Step\Then(sprintf('I go on the last executed job resume of "%s"', $code))

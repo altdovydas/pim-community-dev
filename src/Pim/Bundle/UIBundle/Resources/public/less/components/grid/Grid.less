@@ -335,6 +335,10 @@
     display: block;
   }
 
+  &-movableRow {
+    cursor: move;
+  }
+
   &-bodyRow--withLayer {
     &:before,
     &:after {
@@ -402,10 +406,6 @@
     border-color: @AknDarkBlue;
     background: @AknDarkBlue;
     color: white;
-  }
-
-  &-bodyRow--thumbnail:hover &-subTitle {
-    display: none;
   }
 
   &-bodyRow--thumbnail:hover &-description {

@@ -41,6 +41,7 @@ job_execution.summary:
     skipped: saltato, estensione nella white list
   product_skipped_no_diff: prodotto saltato (nessuna differenza)
   product_skipped_no_associations: prodotto saltato (associazioni non rilevate)
+  product_model_skipped_no_associations: modello prodotto saltato (nessuna associazione rilevata)
   product_model_skipped_no_diff: modello di prodotto saltato (nessuna differenza)
   item_position: linee lette
   skipped_in_root_product_model: modello di prodotto con padre saltato
@@ -188,6 +189,7 @@ batch_jobs:
     import_root_product_model.label: Importazione modello di prodotto radice
     import_sub_product_model.label: Importazione sotto-modelli di prodotto
     import_product_model_descendants.label: Calcola i modelli di prodotto discendenti
+    import_associations.label: Importazione associazioni
   xlsx_group_export:
     label: Esportazione gruppi in XLSX
     export.label: Esportazione gruppi

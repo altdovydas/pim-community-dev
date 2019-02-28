@@ -1,0 +1,11 @@
+version: '2'
+
+services:
+  mysql-behat:
+    tmpfs:
+      - '/tmp'
+      - '/var/lib/mysql'
+
+  fpm:
+    environment:
+      BEHAT_SCREENSHOT_PATH: '/srv/pim/var/tests/screenshots'

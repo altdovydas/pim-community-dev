@@ -1,8 +1,47 @@
 # 2.0.x
 
+# 2.0.49 (2019-02-25)
+
 ## Bug fixes
 
--GITHUB-7532: Fix the prepopulation of textarea field - cheers MarieMinasyan, userz58, kanduvisla & oliverde8 !    
+- PIM-8158: Improve the label category tree creation button label
+- PIM-8141: Fix attribute filter selection in export profile edition
+
+# 2.0.48 (2019-02-18)
+
+## Bug fixes
+
+- PIM-8054: Fix slow mysql query in the grid
+- PIM-8058: Backport PIM-8020 to update missing attributes
+
+# 2.0.47 (2019-02-13)
+
+## Bug fixes
+
+- PIM-7889: Fix product & product model classification in Elasticsearch after a category deletion
+
+# 2.0.46 (2019-01-28)
+
+# 2.0.45 (2018-12-18)
+
+## Bug fixes
+
+- GITHUB-7932: Fix the requirements with mysql port - cheers @Schwierig !
+- PIM-7886: Fix translations of boolean attributes
+- PIM-7902: Fix unnecessary calls for unread messages count on page navigation
+- PIM-7767: Fix "The EntityManager is closed" error that occurred when importing a huge attribute option file (_backport of PIM-7767_)
+
+# 2.0.44 (2018-11-29)
+
+## Bug fixes
+
+- PIM-7855: Fix the add of optional attributes on product with family, if imported file doesn't have the family column
+
+# 2.0.43 (2018-11-27)
+
+## Bug fixes
+
+- GITHUB-7532: Fix the prepopulation of textarea field - cheers @MarieMinasyan, @userz58, kanduvisla & @oliverde8 !
 
 # 2.0.42 (2018-11-12)
 
@@ -33,7 +72,7 @@
 ## Bug fixes
 
 - PIM-7637: Fix computation of completness of variant products when an attribute at product model level is updated on a bulk action
-- PIM-7639: Fix the "forgot password" title visibility 
+- PIM-7639: Fix the "forgot password" title visibility
 - PIM-7265: Fix attributes groups order on the PEF
 
 # 2.0.36 (2018-09-05)
@@ -46,7 +85,7 @@
 
 ## Bug fixes
 
-- PIM-7595: Add missing acl on family variant managment 
+- PIM-7595: Add missing acl on family variant managment
 - PIM-7557: Don't display attribute group filter if no attribute is chosen in "edit common attributes" action
 
 # 2.0.34 (2018-08-17)

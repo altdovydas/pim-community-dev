@@ -2,13 +2,82 @@
 
 ## Bug fixes
 
-- PIM-7898: Fix tab navigation when the column is collapsed
 - #9023: `Nesting level too deep – recursive dependency?` for some custom reference_data attributes
+
+# 2.3.31 (2019-02-28)
+
+## Bug fixes
+
+- PIM-8056: Remove bad ACL on the internal API end-point that get an association-type
+- PIM-8162: use the catalog locale in product export builder
+- PIM-8155: Fix bad ACL set on xlsx product export edit form
+
+# 2.3.30 (2019-02-21)
+
+## Bug fixes
+
+- PIM-8134: Fix flickering on assets
+- PIM-8131: Labels cannot be used for search in bulk actions
+- PIM-7939: Fix PQB search when an attribute as label is on an ancestor.
+  -> Not mandatory, you can re-index your products and product models to enjoy this fix with commands: `bin/console pim:product:index --all` and `bin/console pim:product-model:index --all`.
+
+# 2.3.29 (2019-02-11)
+
+## Bug fixes
+
+- PIM-7943: Fix duplicate popin mask in family variant edit form.
+- PIM-8010: Add missing job in minimal fixture
+- PIM-8007: Content of sortable attribute options is now copyable.
+- PIM-8008: Fix attributes sort order in PEF.
+- PIM-8022: Fix the job status when using the batch command.
+- PIM-8050: Fix ElasticSearch mappings loader
+
+# 2.3.28 (2019-02-01)
+
+# 2.3.27 (2019-01-29)
+
+# 2.3.26 (2019-01-28)
+
+## Bug fixes
+
+- PIM-7967: Fix ACL for asset categories
+- PIM-7969: fix special chars in PDF export
+- Force the use of ip-regex at 2.1.0 version. Upper version needs nodejs >= 8 but we have to support nodejs >= 6.
+
+# 2.3.25 (2019-01-17)
+
+## Bug fixes
+
+- PIM-7965: fix families patch endpoint when updating a family with a family variant 
+- PIM-7961: Fix localizable assets used as main image for family and added to product product model
+
+# 2.3.24 (2019-01-10)
+ 
+## Bug fixes
+
+- PIM-7934: Fix translations of product model import
+- PIM-7961: Fix localizable assets used as main image for family and added to product product model
+
+# 2.3.23 (2019-01-03)
+ 
+## Bug fixes
+
+- PIM-7899: Remove Date of Birth field
+- PIM-7926: Fix the parent property setter when "enabled comparison" is set to false in an import job definition
+
+# 2.3.22 (2018-12-21)
+
+## Bug fixes
+
+- PIM-7892: Allow to filter on active catalog locale when adding an attribute to the product export filters
+- PIM-7898: Fix tab navigation when the column is collapsed
+- PIM-7866: Do not show delete icon on import/export profile if the user doesn't have the right to delete.
 - PIM-7910: Search parent filter is now case insensitive
+- PIM-7936: Missing breadcrumb when you create Attribute group or Channel
 
-## Elasticsearch
-
-- Please re-index the products and product models by launching the commands `console akeneo:elasticsearch:reset-indexes -e prod` and `pim:product:index --all -e prod`.
+ ## Elasticsearch
+ 
+ - Please re-index the products and product models by launching the commands `console akeneo:elasticsearch:reset-indexes -e prod` and `pim:product:index --all -e prod`.
 
 # 2.3.21 (2018-12-07)
 

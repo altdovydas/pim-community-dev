@@ -2,7 +2,7 @@
 
 ## Bug fixes
 
-- #9023: `Nesting level too deep – recursive dependency?` for some custom reference_data attributes
+- PIM-8176: `Nesting level too deep – recursive dependency?` for some custom reference_data attributes
 
 # 2.3.31 (2019-02-28)
 

@@ -60,9 +60,8 @@ class MediaAttributeSetter extends AbstractAttributeSetter
         $options = $this->resolver->resolve($options);
         $this->checkData($attribute, $data);
 
-        if (null === $data) {
-            $file = null;
-        } elseif (null === $file = $this->repository->findOneByIdentifier($data)) {
+        $file = null;
+        if ($data !== null && !$this->isFileAlreadyStored($data)) {
             $file = $this->storeFile($attribute, $data);
         }
 
@@ -92,17 +91,15 @@ class MediaAttributeSetter extends AbstractAttributeSetter
      * TODO: inform the user that this could take some time.
      *
      * @param AttributeInterface $attribute
-     * @param mixed              $data
+     * @param string             $data
      *
-     * @throws InvalidPropertyException If an invalid filePath is provided
      * @return FileInfoInterface|null
+     * @throws \Akeneo\Tool\Component\FileStorage\Exception\FileRemovalException
+     * @throws \Akeneo\Tool\Component\FileStorage\Exception\FileTransferException
+     * @throws \Exception
      */
-    protected function storeFile(AttributeInterface $attribute, $data)
+    protected function storeFile(AttributeInterface $attribute, string $data)
     {
-        if (null === $data) {
-            return null;
-        }
-
         $rawFile = new \SplFileInfo($data);
 
         if (!$rawFile->isFile()) {
@@ -116,5 +113,10 @@ class MediaAttributeSetter extends AbstractAttributeSetter
         $file = $this->storer->store($rawFile, FileStorage::CATALOG_STORAGE_ALIAS);
 
         return $file;
+    }
+
+    private function isFileAlreadyStored(string $data): bool
+    {
+        return null !== $this->repository->findOneByIdentifier($data);
     }
 }

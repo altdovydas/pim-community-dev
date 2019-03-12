@@ -26,8 +26,6 @@ BENCHMARK_REPOSITORY='git@github.com:akeneo/akeneo-benchmark.git'
 BENCHMARK_PATH="${WORKING_DIRECTORY}/akeneo-benchmark"
 BENCHMARK_API_PATH="${BENCHMARK_PATH}/api"
 
-RESULT_CSV="${WORKING_DIRECTORY}/product_api_benchmark.csv"
-
 mkdir -p "${WORKING_DIRECTORY}/raw_results"
 
 function generate_api_credentials
@@ -96,9 +94,6 @@ cd ${DATA_GENERATOR_PATH}
 docker-compose up -d --remove-orphans
 docker-compose run php /usr/local/bin/composer install -n
 
-touch ${RESULT_CSV}
-echo "nb_attributes;average_product_size;get;create;update" > ${RESULT_CSV}
-
 echo "=========================================== Install PIM minimal ================================================="
 cd ${PIM_PATH}
 rm -rf var/cache/*
@@ -119,46 +114,34 @@ echo "=============== Build the base reference_catalog (without families / attri
 boot_data_generator
 
 cd ${DATA_GENERATOR_PATH}
-cp "${PIM_PATH}/bin/docker/product_api_catalog.yml" "${DATA_GENERATOR_PATH}/app/catalog/product_api_catalog.yml"
+cp "${PIM_PATH}/var/benchmarks/product_api_catalog.yml" "${DATA_GENERATOR_PATH}/app/catalog/product_api_catalog.yml"
 docker-compose run php bin/console akeneo:api:generate-catalog --with-products --check-minimal-install product_api_catalog.yml
 
+echo "========================= Start bench products with 120 attributes ================================"
 cd ${PIM_PATH}
+PRODUCT_SIZE=$(docker-compose exec mysql-behat mysql -uakeneo_pim -pakeneo_pim akeneo_pim -N -s -e "select AVG(JSON_LENGTH(JSON_EXTRACT(raw_values, '$.*.*.*'))) avg_product_values FROM pim_catalog_product;" | tail -n -1 | grep -Eo '[0-9]+([.][0-9]+)?')
 
-docker-compose exec mysql-behat /usr/bin/mysqldump -u akeneo_pim --password=akeneo_pim akeneo_pim > "${WORKING_DIRECTORY}/base_reference_catalog.sql"
+echo ">>>>>> Start Benchmark"
+boot_benchmark
+cd ${BENCHMARK_API_PATH}
+docker-compose run php bin/console akeneo:api:launch-benchmarks -i 10 -b "get_many_products" -vv > "${WORKING_DIRECTORY}/raw_results/get_results.txt"
+docker-compose run php bin/console akeneo:api:launch-benchmarks -i 10 -b "create_many_products" -vv > "${WORKING_DIRECTORY}/raw_results/create_results.txt"
+docker-compose run php bin/console akeneo:api:launch-benchmarks -i 10 -b "update_many_products" -vv > "${WORKING_DIRECTORY}/raw_results/update_results.txt"
 
-echo "=========================================== Start bench products ================================================"
-for attributes in 3 10
-do
-    echo "========================= Start bench products with ${attributes} attributes ================================"
-    cd ${PIM_PATH}
-    cat "${WORKING_DIRECTORY}/base_reference_catalog.sql" | docker exec `docker-compose ps -q mysql-behat` mysql -u akeneo_pim --password=akeneo_pim akeneo_pim
-    docker-compose exec fpm bin/console --env=prod akeneo:elasticsearch:reset-indexes --no-interaction -q
+cd "${WORKING_DIRECTORY}/raw_results"
+GET=$(cat "get_results.txt" | grep "Mean speed" | cut -c46- | grep -Eo '[0-9]+([.][0-9]+)?')
+CREATE=$(cat "create_results.txt" | grep "Mean speed" | cut -c46- | grep -Eo '[0-9]+([.][0-9]+)?')
+UPDATE=$(cat "update_results.txt" | grep "Mean speed" | cut -c46- | grep -Eo '[0-9]+([.][0-9]+)?')
 
-    cd ${DATA_GENERATOR_PATH}
-    echo ">>>>>> Generate 100 families with ${attributes} attributes per family"
-    docker-compose run php bin/console akeneo:api:generate-families 100 ${attributes} -q
-    echo ">>>>>> Generate 1000 products"
-    docker-compose run php bin/console akeneo:api:generate-products 1000 -q
-
-    cd ${PIM_PATH}
-    PRODUCT_SIZE=$(docker-compose exec mysql-behat mysql -uakeneo_pim -pakeneo_pim akeneo_pim -N -s -e "select AVG(JSON_LENGTH(JSON_EXTRACT(raw_values, '$.*.*.*'))) avg_product_values FROM pim_catalog_product;" | tail -n -1 | grep -Eo '[0-9]+([.][0-9]+)?')
-
-    echo ">>>>>> Start Benchmark"
-    boot_benchmark
-    cd ${BENCHMARK_API_PATH}
-    docker-compose run php bin/console akeneo:api:launch-benchmarks -i 3 -b "get_many_products" -vv > "${WORKING_DIRECTORY}/raw_results/get_results_${attributes}.txt"
-    docker-compose run php bin/console akeneo:api:launch-benchmarks -i 3 -b "create_many_products" -vv > "${WORKING_DIRECTORY}/raw_results/create_results_${attributes}.txt"
-    docker-compose run php bin/console akeneo:api:launch-benchmarks -i 3 -b "update_many_products" -vv > "${WORKING_DIRECTORY}/raw_results/update_results_${attributes}.txt"
-
-    cd "${WORKING_DIRECTORY}/raw_results"
-    GET=$(cat "get_results_${attributes}.txt" | grep "Mean speed" | cut -c46- | grep -Eo '[0-9]+([.][0-9]+)?')
-    CREATE=$(cat "create_results_${attributes}.txt" | grep "Mean speed" | cut -c46- | grep -Eo '[0-9]+([.][0-9]+)?')
-    UPDATE=$(cat "update_results_${attributes}.txt" | grep "Mean speed" | cut -c46- | grep -Eo '[0-9]+([.][0-9]+)?')
-    echo "${attributes};${PRODUCT_SIZE};${GET};${CREATE};${UPDATE}" >> ${RESULT_CSV}
-done
+echo "Currently with 1000 products with ${PRODUCT_SIZE} values in average, the api speeds are:"
+echo "- GET: ${GET} products/second"
+echo "- CREATE: ${CREATE} products/second"
+echo "- UPDATE: ${UPDATE} products/second"
+echo ""
+echo "You can see the detailed results under the folder ${WORKING_DIRECTORY}/raw_results"
+echo ""
 
 cd ${PIM_PATH}
-rm -rf "${WORKING_DIRECTORY}/raw_results"
 rm app/config/parameters.yml
 mv app/config/parameters.yml.bak app/config/parameters.yml
 

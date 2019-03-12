@@ -14,7 +14,10 @@ app/AppKernel_local.php
 app/console_local
 app/archive/*
 var/*
+!var/benchmarks
+var/benchmarks/*
 !var/SymfonyRequirements.php
+!var/benchmarks/product_api_catalog.yml
 app/config/*_local.yml
 app/import/*
 app/export/*
